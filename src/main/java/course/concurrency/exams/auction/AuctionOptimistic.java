@@ -8,7 +8,7 @@ public class AuctionOptimistic implements Auction {
         this.notifier = notifier;
     }
 
-    private Bid latestBid;
+    private Bid latestBid = new Bid(0L, 0L, 0L);
 
     public boolean propose(Bid bid) {
         if (bid.getPrice() > latestBid.getPrice()) {
