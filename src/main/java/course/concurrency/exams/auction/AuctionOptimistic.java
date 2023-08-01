@@ -14,14 +14,25 @@ public class AuctionOptimistic implements Auction {
     private AtomicLong atomicLong = new AtomicLong(0L);
 
     public boolean propose(Bid bid) {
-        if (bid.getPrice() > latestBid.getPrice()) {
-            notifier.sendOutdatedMessage(latestBid);
-            do {
+        boolean updated = false;
+        while (!updated) {
+            Long oldPrice = latestBid.getPrice();
+            Long newPrice = bid.getPrice();
+
+            if (newPrice > oldPrice) {
                 latestBid = bid;
-            } while (!atomicLong.compareAndSet(atomicLong.get(), bid.getPrice()));
-            return true;
+                updated = atomicLong.compareAndSet(oldPrice, newPrice);
+            } else {
+                break;
+            }
+
+            if (updated) {
+                notifier.sendOutdatedMessage(latestBid);
+            }
+
         }
-        return false;
+        return updated;
+
     }
 
     public Bid getLatestBid() {
