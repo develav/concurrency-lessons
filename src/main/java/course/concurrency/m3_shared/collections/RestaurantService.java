@@ -27,11 +27,13 @@ public class RestaurantService {
     }
 
     public Set<String> printStat() {
-        return stat
-                .entrySet()
-                .stream()
-                .map(element -> element.getKey() + " - " + element.getValue())
-                .collect(Collectors.toSet());
+        synchronized (stat) {
+            return stat
+                    .entrySet()
+                    .stream()
+                    .map(element -> element.getKey() + " - " + element.getValue())
+                    .collect(Collectors.toSet());
+        }
     }
 
 
